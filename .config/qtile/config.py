@@ -24,13 +24,30 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from libqtile import bar, layout, widget
+import os
+import subprocess
+
+from libqtile import bar, layout, widget, hook
 from libqtile.config import Click, Drag, Group, Key, Match, Screen
 from libqtile.lazy import lazy
 from libqtile.utils import guess_terminal
 
+
 mod = "mod4"
 terminal = guess_terminal()
+
+colors = [
+    "003b4c",  # Background
+    "66a5ad",  # Current group
+    "ececec",  # Highlight Text
+    "999999",  # Dark Text
+    "73b8bf",  # Widget 1 Color
+    "50a5af",  # Widget 2 Color
+    "40848c",  # Widget 3 Color
+    "306369",  # Widget 4 Color
+    "204246",  # Widget 5 Color
+    "102123",  # Widget 6 Color
+]
 
 keys = [
     # A list of available commands that can be bound to keys can be found
@@ -40,17 +57,26 @@ keys = [
     Key([mod], "l", lazy.layout.right(), desc="Move focus to right"),
     Key([mod], "j", lazy.layout.down(), desc="Move focus down"),
     Key([mod], "k", lazy.layout.up(), desc="Move focus up"),
-    Key([mod], "space", lazy.layout.next(), desc="Move window focus to other window"),
+    # Key([mod], "space", lazy.layout.next(), desc="Move window focus to other window"),
     # Move windows between left/right columns or move up/down in current stack.
     # Moving out of range in Columns layout will create new column.
-    Key([mod, "shift"], "h", lazy.layout.shuffle_left(), desc="Move window to the left"),
-    Key([mod, "shift"], "l", lazy.layout.shuffle_right(), desc="Move window to the right"),
+    Key(
+        [mod, "shift"], "h", lazy.layout.shuffle_left(), desc="Move window to the left"
+    ),
+    Key(
+        [mod, "shift"],
+        "l",
+        lazy.layout.shuffle_right(),
+        desc="Move window to the right",
+    ),
     Key([mod, "shift"], "j", lazy.layout.shuffle_down(), desc="Move window down"),
     Key([mod, "shift"], "k", lazy.layout.shuffle_up(), desc="Move window up"),
     # Grow windows. If current window is on the edge of screen and direction
     # will be to screen edge - window would shrink.
     Key([mod, "control"], "h", lazy.layout.grow_left(), desc="Grow window to the left"),
-    Key([mod, "control"], "l", lazy.layout.grow_right(), desc="Grow window to the right"),
+    Key(
+        [mod, "control"], "l", lazy.layout.grow_right(), desc="Grow window to the right"
+    ),
     Key([mod, "control"], "j", lazy.layout.grow_down(), desc="Grow window down"),
     Key([mod, "control"], "k", lazy.layout.grow_up(), desc="Grow window up"),
     Key([mod], "n", lazy.layout.normalize(), desc="Reset all window sizes"),
@@ -71,42 +97,80 @@ keys = [
     Key([mod, "control"], "r", lazy.reload_config(), desc="Reload the config"),
     Key([mod, "control"], "q", lazy.shutdown(), desc="Shutdown Qtile"),
     Key([mod], "r", lazy.spawncmd(), desc="Spawn a command using a prompt widget"),
+
+    # Rofi config
+    Key(["mod4"], "space", lazy.spawn("rofi -show drun")),
+
+    # Screens
+    # Change to other screen
+    Key([mod], "u",      lazy.to_screen(0)),
+    Key([mod], "i",      lazy.to_screen(1)),
+
 ]
 
-groups = [Group(i) for i in "qwertyuiop"]
+# Groups -----------------
 
-for i in groups:
-    keys.extend(
-        [
-            # mod1 + letter of group = switch to group
-            Key(
-                [mod],
-                i.name,
-                lazy.group[i.name].toscreen(),
-                desc="Switch to group {}".format(i.name),
-            ),
-            # mod1 + shift + letter of group = switch to & move focused window to group
-            Key(
-                [mod, "shift"],
-                i.name,
-                lazy.window.togroup(i.name, switch_group=True),
-                desc="Switch to & move focused window to group {}".format(i.name),
-            ),
-            # Or, use below if you prefer not to switch to that group.
-            # # mod1 + shift + letter of group = move focused window to group
-            # Key([mod, "shift"], i.name, lazy.window.togroup(i.name),
-            #     desc="move focused window to group {}".format(i.name)),
-        ]
-    )
+#groups = [Group(i) for i in "qwertyuiop"]
+#
+#for i in groups[:-1]:
+#    keys.extend(
+#        [
+#            # mod1 + letter of group = switch to group
+#            Key(
+#                [mod],
+#                i.name,
+#                lazy.group[i.name].toscreen(),
+#                desc="Switch to group {}".format(i.name),
+#            ),
+#            # mod1 + shift + letter of group = switch to & move focused window to group
+#            Key(
+#                [mod, "shift"],
+#                i.name,
+#                lazy.window.togroup(i.name, switch_group=True),
+#                desc="Switch to & move focused window to group {}".format(i.name),
+#            ),
+#            # Or, use below if you prefer not to switch to that group.
+#            # # mod1 + shift + letter of group = move focused window to group
+#            # Key([mod, "shift"], i.name, lazy.o group {}".format(i.name)),
+#        ]
+#    )
+
+
+def_layout = "bsp"
+group_names=[("  ",{'layout': def_layout, 'spawn':'alacritty'}),
+           ("  ",{'layout': def_layout}),
+           ("  ",{'layout': def_layout,'spawn':'google-chrome'}),
+           ("  ",{'layout': def_layout }),
+           ("  ",{'layout': def_layout}),
+           ("  ",{'layout': def_layout}),
+           ("  ",{'layout': def_layout}),
+           ("  ",{'layout': def_layout}),
+           ("  ",{'layout': def_layout, 'spawn':'spotify'})]
+
+groups = [Group(name, **kwargs) for name, kwargs in group_names]
+
+for i, (name, kwargs) in enumerate(group_names, 1):
+    keys.append(Key([mod], str(i), lazy.group[name].toscreen()))        # Switch to another group
+    keys.append(Key([mod, "shift"], str(i), lazy.window.togroup(name))) # Send current window to another group	
+
+# -------------------- Groups
+
+
+layout_theme = {
+    "border_width": 2,
+    "margin": 5,
+    "border_focus": colors[7],
+    "border_normal": "1D2330",
+}
 
 layouts = [
-    layout.Columns(border_focus_stack=["#d75f5f", "#8f3d3d"], border_width=4),
-    layout.Max(),
-    # Try more layouts by unleashing below layouts.
+    layout.Bsp(**layout_theme),
+    layout.Max(**layout_theme),
     # layout.Stack(num_stacks=2),
-    # layout.Bsp(),
+    # Try more layouts by unleashing below layouts.
+    # layout.Columns(),
     # layout.Matrix(),
-    # layout.MonadTall(),
+    layout.MonadTall(**layout_theme),
     # layout.MonadWide(),
     # layout.RatioTile(),
     # layout.Tile(),
@@ -114,6 +178,7 @@ layouts = [
     # layout.VerticalTile(),
     # layout.Zoomy(),
 ]
+
 old_widget_defaults = dict(
     font="sans",
     fontsize=20,
@@ -127,45 +192,63 @@ widget_defaults = dict(
 )
 extension_defaults = widget_defaults.copy()
 
+
 bar = bar.Bar(
-            [
-                widget.CurrentLayout(),
-                widget.GroupBox(),
-                widget.Prompt(),
-                widget.WindowName(),
-                widget.Chord(
-                    chords_colors={
-                        "launch": ("#ff0000", "#ffffff"),
-                    },
-                    name_transform=lambda name: name.upper(),
-                ),
-                #widget.TextBox("default config", name="default"),
-                widget.KeyboardLayout(configured_keyboards=['us', 'fr']),
-                
-                widget.TextBox("Press &lt;M-r&gt; to spawn", foreground="#d75f5f"),
-                # NB Systray is incompatible with Wayland, consider using StatusNotifier instead
-                # widget.StatusNotifier(),
-                widget.Systray(),
-                widget.Clock(format="%Y-%m-%d %a %I:%M %p"),
-                widget.QuickExit(),
-            ],
-            24,
-            # border_width=[2, 0, 2, 0],  # Draw top and bottom borders
-            # border_color=["ff00ff", "000000", "ff00ff", "000000"]  # Borders are magenta
-        )
+    [
+        widget.Sep(
+            linewidth=0,
+            padding=9,
+        ),
+        widget.CurrentLayout(),
+        widget.GroupBox(
+            rounded=False,
+            active=colors[7],  # Color of text of active group
+            inactive=colors[6],
+            highlight_method="block",
+            highlight_color=[colors[3], colors[4]],
+            # current_screen_border = colors[1],
+            this_current_screen_border=colors[1],
+        ),
+        #        widget.GroupBox(
+        #    rounded=False,
+        # ),
+        widget.Prompt(),
+        widget.WindowName(),
+        widget.Chord(
+            chords_colors={
+                "launch": ("#ff0000", "#ffffff"),
+            },
+            name_transform=lambda name: name.upper(),
+        ),
+        # widget.TextBox("default config", name="default"),
+        widget.KeyboardLayout(configured_keyboards=["us", "fr"]),
+        widget.TextBox("Press &lt;M-r&gt; to spawn", foreground="#d75f5f"),
+        # NB Systray is incompatible with Wayland, consider using StatusNotifier instead
+        # widget.StatusNotifier(),
+        widget.Systray(),
+        widget.Clock(format="%Y-%m-%d %a %I:%M %p"),
+        widget.QuickExit(),
+    ],
+    24,
+    # border_width=[2, 0, 2, 0],  # Draw top and bottom borders
+    # border_color=["ff00ff", "000000", "ff00ff", "000000"]  # Borders are magenta
+)
 screens = [
-    Screen(
-        top=bar
-    ),
-    Screen(
-        top=bar
-    ),
+    Screen(top=bar),
+    Screen(top=bar),
 ]
 
 # Drag floating layouts.
 mouse = [
-    Drag([mod], "Button1", lazy.window.set_position_floating(), start=lazy.window.get_position()),
-    Drag([mod], "Button3", lazy.window.set_size_floating(), start=lazy.window.get_size()),
+    Drag(
+        [mod],
+        "Button1",
+        lazy.window.set_position_floating(),
+        start=lazy.window.get_position(),
+    ),
+    Drag(
+        [mod], "Button3", lazy.window.set_size_floating(), start=lazy.window.get_size()
+    ),
     Click([mod], "Button2", lazy.window.bring_to_front()),
 ]
 
@@ -206,3 +289,12 @@ wl_input_rules = None
 # We choose LG3D to maximize irony: it is a 3D non-reparenting WM written in
 # java that happens to be on java's whitelist.
 wmname = "LG3D"
+
+
+# Hooks 
+@hook.subscribe.startup_once
+def start_once():
+    start_script = os.path.expanduser("~/.config/qtile/autostart.sh")
+    subprocess.call([start_script])
+
+

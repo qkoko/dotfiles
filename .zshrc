@@ -84,6 +84,7 @@ source $ZSH/oh-my-zsh.sh
 alias ll="ls -la"
 alias ggrep='git grep --color -n -P';
 alias emacs="emacsclient -c -a 'emacs'"
+alias qtconf="vim ~/.config/qtile/config.py"
 # User configuration
 
 # export MANPATH="/usr/local/man:$MANPATH"
