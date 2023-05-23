@@ -1,29 +1,3 @@
-# Copyright (c) 2010 Aldo Cortesi
-# Copyright (c) 2010, 2014 dequis
-# Copyright (c) 2012 Randall Ma
-# Copyright (c) 2012-2014 Tycho Andersen
-# Copyright (c) 2012 Craig Barnes
-# Copyright (c) 2013 horsik
-# Copyright (c) 2013 Tao Sauvage
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.
-
 import os
 import subprocess
 
@@ -48,6 +22,25 @@ colors = [
     "204246",  # Widget 5 Color
     "102123",  # Widget 6 Color
 ]
+fgcolor = colors[0]
+
+catppuccin = {
+    "flamingo": "#F3CDCD",
+    "mauve": "#DDB6F2",
+    "pink": "#f5c2e7",
+    "maroon": "#e8a2af",
+    "red": "#f28fad",
+    "peach": "#f8bd96",
+    "yellow": "#fae3b0",
+    "green": "#abe9b3",
+    "teal": "#b4e8e0",
+    "blue": "#96cdfb",
+    "sky": "#89dceb",
+    "white": "#d9e0ee",
+    "gray": "#6e6c7e",
+    "black": "#1a1826",
+}
+
 
 keys = [
     # A list of available commands that can be bound to keys can be found
@@ -97,22 +90,46 @@ keys = [
     Key([mod, "control"], "r", lazy.reload_config(), desc="Reload the config"),
     Key([mod, "control"], "q", lazy.shutdown(), desc="Shutdown Qtile"),
     Key([mod], "r", lazy.spawncmd(), desc="Spawn a command using a prompt widget"),
-
     # Rofi config
     Key(["mod4"], "space", lazy.spawn("rofi -show drun")),
-
+    Key(["mod4"], "e", lazy.spawn("nautilus")),
     # Screens
     # Change to other screen
-    Key([mod], "u",      lazy.to_screen(0)),
-    Key([mod], "i",      lazy.to_screen(1)),
-
+    Key([mod], "u", lazy.to_screen(0)),
+    Key([mod], "i", lazy.to_screen(1)),
+    # Change the volume if our keyboard has keys
+    Key([], "XF86AudioRaiseVolume", lazy.spawn("amixer -c 0 -q set Master 2dB+")),
+    Key([], "XF86AudioLowerVolume", lazy.spawn("amixer -c 0 -q set Master 2dB-")),
+    Key([], "XF86AudioMute", lazy.spawn("amixer -D pulse set Master 1+ toggle")),
+    # Commands to control spt spotify player
+    Key(
+        [],
+        "XF86AudioPlay",
+        lazy.spawn("spt playback -t"),
+        desc="Play/pause music on spt (Spotify)",
+    ),
+    Key(
+        [],
+        "XF86AudioPrev",
+        lazy.spawn("spt playback -p"),
+        desc="Play previous song on spt (Spotify)",
+    ),
+    Key(
+        [],
+        "XF86AudioNext",
+        lazy.spawn("spt playback -n"),
+        desc="Play next song on spt (Spotify)",
+    ),
+    # Change screen brightness
+    Key([], "XF86MonBrightnessUp", lazy.spawn("xbacklight -inc 10")),
+    Key([], "XF86MonBrightnessDown", lazy.spawn("xbacklight -dec 10")),
 ]
 
 # Groups -----------------
 
-#groups = [Group(i) for i in "qwertyuiop"]
+# groups = [Group(i) for i in "qwertyuiop"]
 #
-#for i in groups[:-1]:
+# for i in groups[:-1]:
 #    keys.extend(
 #        [
 #            # mod1 + letter of group = switch to group
@@ -137,30 +154,37 @@ keys = [
 
 
 def_layout = "bsp"
-group_names=[("  ",{'layout': def_layout, 'spawn':'alacritty'}),
-           ("  ",{'layout': def_layout}),
-           ("  ",{'layout': def_layout,'spawn':'google-chrome'}),
-           ("  ",{'layout': def_layout }),
-           ("  ",{'layout': def_layout}),
-           ("  ",{'layout': def_layout}),
-           ("  ",{'layout': def_layout}),
-           ("  ",{'layout': def_layout}),
-           ("  ",{'layout': def_layout, 'spawn':'spotify'})]
+group_names = [
+    ("  ", {"layout": def_layout, "spawn": "alacritty"}),
+    ("  ", {"layout": def_layout}),
+    ("  ", {"layout": def_layout, "spawn": "google-chrome"}),
+    ("  ", {"layout": def_layout}),
+    ("  ", {"layout": def_layout}),
+    ("  ", {"layout": def_layout}),
+    ("  ", {"layout": def_layout}),
+    ("  ", {"layout": def_layout}),
+    ("  ", {"layout": def_layout, "spawn": "spotify"}),
+]
 
 groups = [Group(name, **kwargs) for name, kwargs in group_names]
 
 for i, (name, kwargs) in enumerate(group_names, 1):
-    keys.append(Key([mod], str(i), lazy.group[name].toscreen()))        # Switch to another group
-    keys.append(Key([mod, "shift"], str(i), lazy.window.togroup(name))) # Send current window to another group	
+    keys.append(
+        Key([mod], str(i), lazy.group[name].toscreen())
+    )  # Switch to another group
+    keys.append(
+        Key([mod, "shift"], str(i), lazy.window.togroup(name))
+    )  # Send current window to another group
 
 # -------------------- Groups
 
 
 layout_theme = {
     "border_width": 2,
-    "margin": 5,
-    "border_focus": colors[7],
-    "border_normal": "1D2330",
+    "margin": 8,
+    #"border_focus_stack": ["#d75f5f", "#8f3d3d"],
+    "border_focus": catppuccin["green"],
+    "border_normal": catppuccin["teal"],
 }
 
 layouts = [
@@ -179,63 +203,199 @@ layouts = [
     # layout.Zoomy(),
 ]
 
-old_widget_defaults = dict(
-    font="sans",
-    fontsize=20,
-    padding=3,
-)
-
 widget_defaults = dict(
     font="JetBrainsMono Nerd Font",
     fontsize=18,
-    padding=2,
+    padding=6,
+    #forground=catppuccin["black"],
 )
 extension_defaults = widget_defaults.copy()
 
 
-bar = bar.Bar(
-    [
-        widget.Sep(
-            linewidth=0,
-            padding=9,
-        ),
-        widget.CurrentLayout(),
-        widget.GroupBox(
-            rounded=False,
-            active=colors[7],  # Color of text of active group
-            inactive=colors[6],
-            highlight_method="block",
-            highlight_color=[colors[3], colors[4]],
-            # current_screen_border = colors[1],
-            this_current_screen_border=colors[1],
-        ),
-        #        widget.GroupBox(
-        #    rounded=False,
-        # ),
-        widget.Prompt(),
-        widget.WindowName(),
-        widget.Chord(
-            chords_colors={
-                "launch": ("#ff0000", "#ffffff"),
-            },
-            name_transform=lambda name: name.upper(),
-        ),
-        # widget.TextBox("default config", name="default"),
-        widget.KeyboardLayout(configured_keyboards=["us", "fr"]),
-        widget.TextBox("Press &lt;M-r&gt; to spawn", foreground="#d75f5f"),
-        # NB Systray is incompatible with Wayland, consider using StatusNotifier instead
-        # widget.StatusNotifier(),
-        widget.Systray(),
-        widget.Clock(format="%Y-%m-%d %a %I:%M %p"),
-        widget.QuickExit(),
-    ],
-    24,
-    # border_width=[2, 0, 2, 0],  # Draw top and bottom borders
-    # border_color=["ff00ff", "000000", "ff00ff", "000000"]  # Borders are magenta
-)
 screens = [
-    Screen(top=bar),
-    Screen(top=bar),
+    Screen(
+        top=bar.Bar(
+            [
+                widget.Sep(
+                    linewidth=0,
+                    padding=9,
+                ),
+                widget.GroupBox(
+                    rounded=False,
+                    active=catppuccin["flamingo"],  # Color of text of active group
+                    inactive=catppuccin["green"],
+                    highlight_method="line",
+                    highlight_color=[catppuccin["black"]],
+                    borderwidth=1,
+                    this_current_screen_border=catppuccin["flamingo"],
+                ),
+                widget.Sep(
+                    linewidth=0,
+                    padding=20,
+                ),
+                widget.Spacer(),
+                widget.TextBox(
+                    " Layout:",
+                    background=colors[5],
+                    foreground=fgcolor,
+                ),
+                widget.CurrentLayoutIcon(
+                    background=colors[5],
+                    foreground=fgcolor,
+                    scale=0.7,
+                    padding=8,
+                ),
+                #                widget.CurrentLayout(
+                #                    background = colors[5],
+                #                    foreground = fgcolor,
+                #                    padding = 5,
+                #                    ),
+                widget.Volume(
+                    emoji=False,
+                    background=colors[6],
+                    foreground=fgcolor,
+                    fmt=" {}",
+                    padding=8,
+                ),
+                widget.Clock(
+                    format=" %d/%m/%y  %H:%M",
+                    background=colors[7],
+                    foreground=fgcolor,
+                    padding=9,
+                ),
+                widget.Battery(
+                    background=colors[8],
+                    foreground=fgcolor,
+                    format=" {char} {percent:2.0%} {hour:d}:{min:02d}",
+                    padding=9,
+                ),
+            ],
+            24,
+            margin=[4, 6, 1, 6],
+            opacity=0.85,
+            background=catppuccin["black"],
+        ),
+        bottom=bar.Bar(
+            [
+                widget.Prompt(),
+                widget.WindowName(),
+                widget.CheckUpdates(
+                    distro="Arch",
+                    fmt=" - {}",
+                    background=colors[5],
+                    foreground=fgcolor,
+                    padding=9,
+                    no_update_string=" : N/A",
+                ),
+                widget.Pomodoro(
+                    background=colors[6],
+                    foreground=fgcolor,
+                    padding=9,
+                    color_inactive="ff9933",
+                ),
+                # widget.HDDGraph(
+                #     background = colors[7],
+                #     foreground = fgcolor,
+                #     path = '/dev/sda2',
+                #     ),
+                widget.Systray(),
+            ],
+            26,
+            margin=[1, 6, 4, 6],
+            opacity=0.85,
+        ),
+    ),
+    Screen(
+        top=bar.Bar(
+            [
+                widget.Sep(
+                    linewidth=0,
+                    padding=9,
+                ),
+                widget.GroupBox(
+                    rounded=False,
+                    active=colors[7],  # Color of text of active group
+                    inactive=colors[6],
+                    highlight_method="block",
+                    highlight_color=[colors[3], colors[4]],
+                    # current_screen_border = colors[1],
+                    this_current_screen_border=colors[1],
+                ),
+                widget.Sep(
+                    linewidth=0,
+                    padding=20,
+                ),
+                widget.Spacer(),
+                widget.TextBox(
+                    " Layout:",
+                    background=colors[5],
+                    foreground=fgcolor,
+                ),
+                widget.CurrentLayoutIcon(
+                    background=colors[5],
+                    foreground=fgcolor,
+                    scale=0.7,
+                    padding=8,
+                ),
+                #                widget.CurrentLayout(
+                #                    background = colors[5],
+                #                    foreground = fgcolor,
+                #                    padding = 5,
+                #                    ),
+                widget.Volume(
+                    emoji=False,
+                    background=colors[6],
+                    foreground=fgcolor,
+                    fmt=" {}",
+                    padding=8,
+                ),
+                widget.Clock(
+                    format=" %d/%m/%y  %H:%M",
+                    background=colors[7],
+                    foreground=fgcolor,
+                    padding=9,
+                ),
+                widget.Battery(
+                    background=colors[8],
+                    foreground=fgcolor,
+                    format=" {char} {percent:2.0%} {hour:d}:{min:02d}",
+                    padding=9,
+                ),
+            ],
+            24,
+            margin=[4, 6, 1, 6],
+            opacity=0.85,
+        ),
+        bottom=bar.Bar(
+            [
+                widget.Prompt(),
+                widget.WindowName(),
+                widget.CheckUpdates(
+                    distro="Arch",
+                    fmt=" - {}",
+                    background=colors[5],
+                    foreground=fgcolor,
+                    padding=9,
+                    no_update_string=" : N/A",
+                ),
+                widget.Pomodoro(
+                    background=colors[6],
+                    foreground=fgcolor,
+                    padding=9,
+                    color_inactive="ff9933",
+                ),
+                # widget.HDDGraph(
+                #     background = colors[7],
+                #     foreground = fgcolor,
+                #     path = '/dev/sda2',
+                #     ),
+                widget.Systray(),
+            ],
+            26,
+            margin=[1, 6, 4, 6],
+            opacity=0.85,
+        ),
+    ),
 ]
 
 # Drag floating layouts.
@@ -291,10 +451,8 @@ wl_input_rules = None
 wmname = "LG3D"
 
 
-# Hooks 
+# Hooks
 @hook.subscribe.startup_once
 def start_once():
     start_script = os.path.expanduser("~/.config/qtile/autostart.sh")
     subprocess.call([start_script])
-
-

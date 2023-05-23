@@ -1,0 +1,106 @@
+[global_config]
+  always_on_top = True
+  inactive_color_offset = 0.7083333333333334
+  enabled_plugins = LaunchpadBugURLHandler, LaunchpadCodeURLHandler, APTURLHandler, TerminatorThemes
+[keybindings]
+[profiles]
+  [[default]]
+    background_color = "#1f1d27"
+    background_darkness = 0.97
+    background_type = transparent
+    cursor_color = "#ff9839"
+    foreground_color = "#b7a1ff"
+    palette = "#1f1d27:#d9393e:#2dcd73:#d9b76e:#ffc284:#de8d40:#2488ff:#b7a1ff:#353147:#d9393e:#2dcd73:#d9b76e:#ffc284:#de8d40:#2488ff:#eae5ff"
+    custom_command = '''zsh --rcfile <(cat ${HOME}/.zshrc; echo 'export PROMPT_COMMAND="source /home/qkoko/.virtualenvs/EspaceClient/bin/activate; unset PROMPT_COMMAND"') -i'''
+  [[Cobalt Neon]]
+    background_color = "#142838"
+    cursor_color = "#c4206f"
+    foreground_color = "#8ff586"
+    palette = "#142631:#ff2320:#3ba5ff:#e9e75c:#8ff586:#781aa0:#8ff586:#ba46b2:#fff688:#d4312e:#8ff586:#e9f06d:#3c7dd2:#8230a7:#6cbc67:#8ff586"
+  [[Darkside]]
+    background_color = "#222324"
+    cursor_color = "#bbbbbb"
+    foreground_color = "#bababa"
+    palette = "#000000:#e8341c:#68c256:#f2d42c:#1c98e8:#8e69c9:#1c98e8:#bababa:#000000:#e05a4f:#77b869:#efd64b:#387cd3:#957bbe:#3d97e2:#bababa"
+  [[After Dark]]
+    background_color = "#10111b"
+    cursor_color = "#aaaaaa"
+    palette = "#2e3436:#ef4a9e:#00d2bc:#e7ca7a:#9399fa:#ca5bcc:#86d079:#d3d7cf:#555753:#ef4a9e:#00d2bc:#e7ca7a:#9399fa:#ca5bcc:#86d079:#eeeeec"
+  [[Ocean dark]]
+    background_color = "#1c1f27"
+    cursor_color = "#a0a4b2"
+    foreground_color = "#979cac"
+    palette = "#4F4F4F:#AF4B57:#AFD383:#E5C079:#7D90A4:#A4799D:#85A6A5:#EEEDEE:#7B7B7B:#AF4B57:#CEFFAB:#FFFECC:#B5DCFE:#FB9BFE:#DFDFFD:#FEFFFE"
+  [[Duotone Dark]]
+    background_color = "#1f1d27"
+    cursor_color = "#ff9839"
+    foreground_color = "#b7a1ff"
+    palette = "#1f1d27:#d9393e:#2dcd73:#d9b76e:#ffc284:#de8d40:#2488ff:#b7a1ff:#353147:#d9393e:#2dcd73:#d9b76e:#ffc284:#de8d40:#2488ff:#eae5ff"
+[layouts]
+  [[default]]
+    [[[window0]]]
+      type = Window
+      parent = ""
+    [[[child1]]]
+      type = Terminal
+      parent = window0
+      profile = Duotone Dark
+  [[eec]]
+    [[[child0]]]
+      type = Window
+      parent = ""
+      order = 0
+      position = 3634:130
+      maximised = False
+      fullscreen = False
+      size = 734, 451
+      title = qkoko@qkoko-Legion-ub:~
+      last_active_term = 4b4c006a-cc1e-4756-aad0-7c05ab736070
+      last_active_window = True
+    [[[child1]]]
+      type = HPaned
+      parent = child0
+      order = 0
+      position = 364
+      ratio = 0.4993141289437586
+    [[[child2]]]
+      type = VPaned
+      parent = child1
+      order = 0
+      position = 223
+      ratio = 0.5
+    [[[terminal3]]]
+      type = Terminal
+      parent = child2
+      order = 0
+      profile = Duotone Dark
+      uuid = 4b4c006a-cc1e-4756-aad0-7c05ab736070
+      command = '''zsh --rcfile <(cat ${HOME}/.zshrc; echo 'export PROMPT_COMMAND="workon EspaceClient; unset PROMPT_COMMAND"') -i'''
+    [[[terminal4]]]
+      type = Terminal
+      parent = child2
+      order = 1
+      profile = default
+      uuid = 09e399c1-f4e8-4453-8af8-b9a07d4fdbe1
+      command = '''zsh --rcfile <(cat ${HOME}/.zshrc; echo 'export PROMPT_COMMAND="workon EspaceClient; unset PROMPT_COMMAND"') -i'''
+    [[[child5]]]
+      type = VPaned
+      parent = child1
+      order = 1
+      position = 223
+      ratio = 0.5
+    [[[terminal6]]]
+      type = Terminal
+      parent = child5
+      order = 0
+      profile = default
+      uuid = b7d0b095-1eba-45e8-ae3e-e5640f7ccd59
+      command = '''zsh --rcfile <(cat ${HOME}/.zshrc; echo 'export PROMPT_COMMAND="workon EspaceClient; unset PROMPT_COMMAND"') -i'''
+    [[[terminal7]]]
+      type = Terminal
+      parent = child5
+      order = 1
+      profile = default
+      uuid = d90b9ad1-fe36-454e-8684-20e6404675cf
+      command = '''zsh --rcfile <(cat ${HOME}/.zshrc; echo 'export PROMPT_COMMAND="workon EspaceClient; unset PROMPT_COMMAND"') -i'''
+[plugins]
